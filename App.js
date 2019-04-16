@@ -14,8 +14,8 @@ const AppStack = createStackNavigator({
   // Tab: TabNavigator,
   // SignIn: SignInScreen,
   // SignUp: SignUpScreen,
-  Product: ProductScreen,
   Category: CategoryScreen,
+  Product: ProductScreen,
 });
 // const AuthStack = createStackNavigator({
 //   // SignIn: SignInScreen,
