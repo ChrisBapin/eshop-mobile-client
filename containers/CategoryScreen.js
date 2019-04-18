@@ -34,12 +34,12 @@ export default class App extends Component<Props> {
   handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.1.39:8080/create-category",
+        "http://172.16.1.172:8080/create-category",
         {
           title: this.state.category,
         }
       );
-      // if(response.data._id)
+
       console.log("cat", response.data);
       if (response.data._id) {
         const value = JSON.stringify(response.data);
@@ -49,9 +49,10 @@ export default class App extends Component<Props> {
         this.props.navigation.navigate("Product", {
           title: response.data.title,
         });
+        console.log("toto");
       } else {
         await AsyncStorage.setItem("categoryInfo", "");
-        alert(response.data);
+        console.log(response.data);
         this.setState({ category: "" });
       }
     } catch (error) {

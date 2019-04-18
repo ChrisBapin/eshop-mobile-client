@@ -4,14 +4,15 @@ import {
   View,
   AsyncStorage,
   StyleSheet,
-  TextInput,
+  CameraRoll,
   ScrollView,
   Share,
+  Button,
 } from "react-native";
 import { TextField } from "react-native-material-textfield";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { TouchableOpacity } from "react-native-gesture-handler";
-// import { ScrollView } from "react-native-gesture-handler";
+import ImagePicker from "react-native-image-picker";
 import Axios from "axios";
 
 class ProductScreen extends React.Component {
@@ -45,7 +46,7 @@ class ProductScreen extends React.Component {
     let tempInfo = await AsyncStorage.getItem("categoryInfo");
     tempInfo = JSON.parse(tempInfo);
     // console.log("tempInfo", tempInfo);
-    const response = await Axios.get("http://192.168.1.39:8080/get-category");
+    const response = await Axios.get("http://172.16.1.172:8080/get-category");
     console.log("response.data", response.data);
     this.setState({
       category: tempInfo,
@@ -55,7 +56,7 @@ class ProductScreen extends React.Component {
 
   handleClick = async () => {
     try {
-      await Axios.post("http://192.168.1.39:8080/create-product", {
+      await Axios.post("http://172.16.1.172:8080/create-product", {
         title: this.state.title,
         description: this.state.description,
         price: this.state.price,
@@ -65,6 +66,7 @@ class ProductScreen extends React.Component {
         category: this.state.category._id,
       });
       this.setState({
+        picture: "",
         title: "",
         description: "",
         price: "",
@@ -120,10 +122,38 @@ class ProductScreen extends React.Component {
     }
   };
 
+  pickImageHandler = () => {
+    const options = {
+      title: "Choisir une photo",
+      takePhotoButtonTitle: "Prendre une photo",
+      chooseFromLibraryButtonTitle: "Selectionner une photo de la librairie",
+    };
+    ImagePicker.showImagePicker(options, response => {
+      console.log("Response = ", response);
+
+      if (response.didCancel) {
+        console.log("User cancelled image picker");
+      } else if (response.error) {
+        console.log("ImagePicker Error: ", response.error);
+      } else if (response.customButton) {
+        console.log("User tapped custom button: ", response.customButton);
+      } else {
+        // const source = { uri: response.uri };
+
+        // You can also display the image using data:
+        const source = "data:image/jpeg;base64," + response.data;
+        console.log("source", source);
+        this.setState({
+          picture: source,
+        });
+      }
+    });
+  };
+
   render() {
     if (this.state.isLoading === true) {
       return (
-        <View>
+        <View style={{ alignItems: "center" }}>
           <Text>chargement...</Text>
         </View>
       );
@@ -137,13 +167,18 @@ class ProductScreen extends React.Component {
             </View>
             <Text style={styles.titleCate}>{this.state.category.title}</Text>
             <View style={styles.input}>
-              <TextField
+              {/* <TextField
                 label="Photo"
                 value={this.state.picture}
                 onChangeText={picture => {
                   this.setState({ picture });
                 }}
-              />
+              /> */}
+              <View>
+                <TouchableOpacity onPress={this.pickImageHandler}>
+                  <Text>Prendre une photo</Text>
+                </TouchableOpacity>
+              </View>
               <TextField
                 label="Titre du produit"
                 value={this.state.title}
