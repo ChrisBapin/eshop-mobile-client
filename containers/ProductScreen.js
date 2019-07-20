@@ -4,10 +4,9 @@ import {
   View,
   AsyncStorage,
   StyleSheet,
-  CameraRoll,
   ScrollView,
   Share,
-  Button,
+  Image,
 } from "react-native";
 import { TextField } from "react-native-material-textfield";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -25,6 +24,7 @@ class ProductScreen extends React.Component {
     size: "",
     quantity: "",
     picture: "",
+    displayImage: [],
     numberOfItem: 0,
   };
 
@@ -46,8 +46,10 @@ class ProductScreen extends React.Component {
     let tempInfo = await AsyncStorage.getItem("categoryInfo");
     tempInfo = JSON.parse(tempInfo);
     // console.log("tempInfo", tempInfo);
-    const response = await Axios.get("http://172.16.1.172:8080/get-category");
-    console.log("response.data", response.data);
+    const response = await Axios.get(
+      "https://eshop-alex.herokuapp.com/get-category"
+    );
+    // console.log("response.data", response.data);
     this.setState({
       category: tempInfo,
       isLoading: false,
@@ -56,7 +58,7 @@ class ProductScreen extends React.Component {
 
   handleClick = async () => {
     try {
-      await Axios.post("http://172.16.1.172:8080/create-product", {
+      await Axios.post("https://eshop-alex.herokuapp.com/create-product", {
         title: this.state.title,
         description: this.state.description,
         price: this.state.price,
@@ -104,7 +106,7 @@ class ProductScreen extends React.Component {
         dialogTitle: "Voici les nouvelles offres",
         title: "Voici les nouvelles offres",
         message:
-          "Voici les nouvelles offres visiblent sur http://www.test-app.com/" +
+          "Voici les nouvelles offres visiblent sur http://localhost:3000/" +
           this.state.category.url,
       });
 
@@ -127,9 +129,10 @@ class ProductScreen extends React.Component {
       title: "Choisir une photo",
       takePhotoButtonTitle: "Prendre une photo",
       chooseFromLibraryButtonTitle: "Selectionner une photo de la librairie",
+      maxWidth: 500,
     };
     ImagePicker.showImagePicker(options, response => {
-      console.log("Response = ", response);
+      // console.log("Response = ", response);
 
       if (response.didCancel) {
         console.log("User cancelled image picker");
@@ -138,17 +141,31 @@ class ProductScreen extends React.Component {
       } else if (response.customButton) {
         console.log("User tapped custom button: ", response.customButton);
       } else {
-        // const source = { uri: response.uri };
-
+        const source = { uri: response.uri };
+        const newDisplayImage = [...this.state.displayImage];
+        newDisplayImage.push(source);
         // You can also display the image using data:
-        const source = "data:image/jpeg;base64," + response.data;
-        console.log("source", source);
+        const sourceData = "data:image/jpeg;base64," + response.data;
+        // console.log("source", source);
         this.setState({
-          picture: source,
+          picture: sourceData,
+          displayImage: newDisplayImage,
         });
       }
     });
   };
+
+  // displayImage = () => {
+  //   this.state.displayImage.map((image, index) => {
+  //     console.log("image", image);
+  //     return (
+  //       <Image
+  //         style={{ width: 50, height: 50 }}
+  //         source={this.state.displayImage}
+  //       />
+  //     );
+  //   });
+  // };
 
   render() {
     if (this.state.isLoading === true) {
@@ -158,7 +175,7 @@ class ProductScreen extends React.Component {
         </View>
       );
     } else {
-      console.log(this.state);
+      console.log(this.state.displayImage);
       return (
         <ScrollView>
           <View style={styles.mainContainer}>
@@ -174,6 +191,19 @@ class ProductScreen extends React.Component {
                   this.setState({ picture });
                 }}
               /> */}
+              <ScrollView horizontal={true}>
+                {this.state.displayImage.map((image, index) => {
+                  return (
+                    <Image
+                      key={index}
+                      style={{ width: 50, height: 50, marginRight: 20 }}
+                      source={image}
+                    />
+                  );
+                })}
+              </ScrollView>
+
+              {/* {this.displayImage()} */}
               <View>
                 <TouchableOpacity onPress={this.pickImageHandler}>
                   <Text>Prendre une photo</Text>

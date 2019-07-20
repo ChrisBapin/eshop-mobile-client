@@ -8,7 +8,7 @@
 
 import React, { Component } from "react";
 import {
-  Platform,
+  // Platform,
   StyleSheet,
   Text,
   View,
@@ -34,7 +34,7 @@ export default class App extends Component<Props> {
   handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://172.16.1.172:8080/create-category",
+        "https://eshop-alex.herokuapp.com/create-category",
         {
           title: this.state.category,
         }
