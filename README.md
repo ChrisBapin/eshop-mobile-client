@@ -1,6 +1,6 @@
 # Synopsis
 
-This app permit to save a batch of products in category and generate an URL to share with contacts. Built with React Native.
+This app allows to save a batch of products in category and generate an URL to share with contacts. Built with React Native.
 
 ## Functionalities
 
